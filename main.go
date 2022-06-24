@@ -58,6 +58,7 @@ func main() {
 		},
 		cmd.ChallengeCmd{
 			UserDAO: userDAO,
+			Name:    []string{"клоун", "клоуна"},
 		},
 		cmd.UnRegCmd{},
 		cmd.StartCmd{},
