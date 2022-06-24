@@ -1,0 +1,9 @@
+version: '2.2'
+services:
+  db:
+    image: postgres:11
+    environment:
+      - POSTGRES_PASSWORD=super_password
+      - POSTGRES_DB=challenge
+    ports:
+      - '${POSTGRESQL_PORT:-5433}:5432'
