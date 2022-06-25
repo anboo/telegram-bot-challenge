@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"awesomeProject/client"
 	"awesomeProject/db"
 	"context"
 	"fmt"
@@ -19,7 +20,7 @@ func (RegCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "reg"
 }
 
-func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (c RegCmd) Handle(api client.TelegramClient, update tgbotapi.Update) {
 	user := c.UserDAO.FindUserInChat(
 		context.TODO(),
 		strconv.Itoa(int(update.FromChat().ID)),
@@ -27,11 +28,7 @@ func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	)
 
 	if user != nil {
-		m := tgbotapi.NewMessage(update.FromChat().ID, "🗿🗿🗿 Ты уже зарегистрирован в игре")
-		_, err := api.Send(m)
-		if err != nil {
-			log.Println("error send message " + err.Error())
-		}
+		api.SendMessage(update, "🗿🗿🗿 Ты уже зарегистрирован в игре")
 		return
 	}
 
@@ -44,17 +41,12 @@ func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	if err != nil {
 		errMsg := tgbotapi.NewMessage(update.FromChat().ID, "Произошла техническая ошибка")
 		log.Println("error saving user to database " + err.Error())
-		_, errSend := api.Send(errMsg)
+		_, errSend := api.GetAPI().Send(errMsg)
 		if errSend != nil {
 			log.Println("error sending about database error message " + errSend.Error())
 		}
 		return
 	}
 
-	txt := fmt.Sprintf("🤡 Привет, %s. Теперь ты участвуешь в игре!", update.Message.From.String())
-	msg := tgbotapi.NewMessage(update.FromChat().ID, txt)
-
-	if _, err := api.Send(msg); err != nil {
-		panic(err)
-	}
+	api.SendMessage(update, fmt.Sprintf("🤡 Привет, %s. Теперь ты участвуешь в игре!", update.Message.From.String()))
 }

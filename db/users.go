@@ -27,7 +27,7 @@ type UserDAO struct {
 	Db *Database
 }
 
-func (u *UserDAO) FindUserInChat(ctx context.Context, userId string, chatId string) *User {
+func (u UserDAO) FindUserInChat(ctx context.Context, userId string, chatId string) *User {
 	row := u.Db.GetDatabase().QueryRowContext(
 		ctx,
 		"SELECT id, username, telegram_id, chat_id, created_at FROM users WHERE chat_id = $1 AND telegram_id = $2 LIMIT 1",
@@ -53,7 +53,7 @@ func (u *UserDAO) FindUserInChat(ctx context.Context, userId string, chatId stri
 	return &user
 }
 
-func (u *UserDAO) InsertNewUser(ctx context.Context, userId string, chatId string, username string) error {
+func (u UserDAO) InsertNewUser(ctx context.Context, userId string, chatId string, username string) error {
 	_, err := u.Db.GetDatabase().ExecContext(
 		ctx,
 		"INSERT INTO users (id, username, telegram_id, chat_id, created_at) "+
@@ -71,7 +71,7 @@ func (u *UserDAO) InsertNewUser(ctx context.Context, userId string, chatId strin
 	return nil
 }
 
-func (u *UserDAO) FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error) {
+func (u UserDAO) FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error) {
 	rows, err := u.Db.GetDatabase().QueryContext(ctx, "SELECT username FROM users WHERE chat_id = $1", chatId)
 
 	if err != nil {

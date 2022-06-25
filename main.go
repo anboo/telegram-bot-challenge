@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/client"
 	"awesomeProject/cmd"
 	db2 "awesomeProject/db"
 	"fmt"
@@ -37,6 +38,7 @@ func main() {
 	}
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_KEY"))
+	telegram := client.Telegram{BotAPI: bot}
 	if err != nil {
 		panic(err)
 	}
@@ -70,7 +72,7 @@ func main() {
 
 		for _, h := range handlers {
 			if h.Support(update) {
-				h.Handle(bot, update)
+				h.Handle(&telegram, update)
 				break
 			}
 		}

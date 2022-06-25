@@ -2,6 +2,7 @@ package tests
 
 import (
 	"awesomeProject/cmd"
+	"awesomeProject/db"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/golang/mock/gomock"
 	"testing"
@@ -54,6 +55,64 @@ func TestSupport(t *testing.T) {
 	}
 }
 
-func TestHandle(t *testing.T) {
+func TestHandle_RegisterUser(t *testing.T) {
+	userDaoMock := NewMockUsersRepository(gomock.NewController(t))
+	tMock := NewMockTelegramClient(gomock.NewController(t))
 
+	userDaoMock.
+		EXPECT().
+		FindUserInChat(gomock.Any(), gomock.Eq("1"), gomock.Eq("10")).
+		Return(nil)
+
+	userDaoMock.
+		EXPECT().
+		InsertNewUser(gomock.Any(), gomock.Eq("1"), gomock.Eq("10"), gomock.Eq("devanboo")).
+		Return(nil)
+
+	regCmd := cmd.RegCmd{
+		UserDAO: userDaoMock,
+	}
+
+	update := tgbotapi.Update{
+		Message: &tgbotapi.Message{
+			From:     &tgbotapi.User{ID: 10, UserName: "devanboo"},
+			Chat:     &tgbotapi.Chat{ID: 1},
+			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 4}},
+			Text:     "/reg",
+		},
+	}
+
+	tMock.EXPECT().SendMessage(gomock.Eq(update), "🤡 Привет, devanboo. Теперь ты участвуешь в игре!")
+
+	regCmd.Handle(tMock, update)
+}
+
+func TestHandle_UserAlreadyExists(t *testing.T) {
+	userDaoMock := NewMockUsersRepository(gomock.NewController(t))
+	tMock := NewMockTelegramClient(gomock.NewController(t))
+
+	userDaoMock.
+		EXPECT().
+		FindUserInChat(gomock.Any(), gomock.Eq("1"), gomock.Eq("10")).
+		Return(&db.User{
+			Id:         "f225543b-921b-4dc2-a604-b42a0db6013c",
+			Username:   "devanboo",
+			ChatId:     "1",
+			TelegramId: "10",
+		})
+
+	regCmd := cmd.RegCmd{UserDAO: userDaoMock}
+
+	update := tgbotapi.Update{
+		Message: &tgbotapi.Message{
+			From:     &tgbotapi.User{ID: 10},
+			Chat:     &tgbotapi.Chat{ID: 1},
+			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 4}},
+			Text:     "/reg",
+		},
+	}
+
+	tMock.EXPECT().SendMessage(gomock.Eq(update), "🗿🗿🗿 Ты уже зарегистрирован в игре")
+
+	regCmd.Handle(tMock, update)
 }
