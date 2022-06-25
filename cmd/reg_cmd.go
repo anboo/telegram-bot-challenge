@@ -23,8 +23,8 @@ func (RegCmd) Support(update tgbotapi.Update) bool {
 func (c RegCmd) Handle(api client.TelegramClient, update tgbotapi.Update) {
 	user := c.UserDAO.FindUserInChat(
 		context.TODO(),
-		strconv.Itoa(int(update.FromChat().ID)),
 		strconv.Itoa(int(update.Message.From.ID)),
+		strconv.Itoa(int(update.FromChat().ID)),
 	)
 
 	if user != nil {

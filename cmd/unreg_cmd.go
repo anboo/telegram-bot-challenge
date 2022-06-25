@@ -16,6 +16,7 @@ func (UnRegCmd) Support(update tgbotapi.Update) bool {
 
 func (UnRegCmd) Handle(api client.TelegramClient, update tgbotapi.Update) {
 	txt := fmt.Sprintf("%s, больше ты не участвуешь в игре!", update.Message.From.String())
+
 	msg := tgbotapi.NewMessage(update.FromChat().ID, txt)
 	msg.ReplyToMessageID = update.Message.MessageID
 

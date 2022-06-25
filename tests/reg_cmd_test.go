@@ -36,7 +36,7 @@ func TestSupport(t *testing.T) {
 		},
 		{
 			input: &tgbotapi.Message{
-				Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 4}},
+				Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: len("/reg")}},
 				Text:     "/reg",
 			},
 			want: true,
@@ -61,7 +61,7 @@ func TestHandle_RegisterUser(t *testing.T) {
 
 	userDaoMock.
 		EXPECT().
-		FindUserInChat(gomock.Any(), gomock.Eq("1"), gomock.Eq("10")).
+		FindUserInChat(gomock.Any(), gomock.Eq("10"), gomock.Eq("1")).
 		Return(nil)
 
 	userDaoMock.
@@ -77,7 +77,7 @@ func TestHandle_RegisterUser(t *testing.T) {
 		Message: &tgbotapi.Message{
 			From:     &tgbotapi.User{ID: 10, UserName: "devanboo"},
 			Chat:     &tgbotapi.Chat{ID: 1},
-			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 4}},
+			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: len("/reg")}},
 			Text:     "/reg",
 		},
 	}
@@ -93,7 +93,7 @@ func TestHandle_UserAlreadyExists(t *testing.T) {
 
 	userDaoMock.
 		EXPECT().
-		FindUserInChat(gomock.Any(), gomock.Eq("1"), gomock.Eq("10")).
+		FindUserInChat(gomock.Any(), gomock.Eq("10"), gomock.Eq("1")).
 		Return(&db.User{
 			Id:         "f225543b-921b-4dc2-a604-b42a0db6013c",
 			Username:   "devanboo",
@@ -107,7 +107,7 @@ func TestHandle_UserAlreadyExists(t *testing.T) {
 		Message: &tgbotapi.Message{
 			From:     &tgbotapi.User{ID: 10},
 			Chat:     &tgbotapi.Chat{ID: 1},
-			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 4}},
+			Entities: []tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: len("/reg")}},
 			Text:     "/reg",
 		},
 	}
