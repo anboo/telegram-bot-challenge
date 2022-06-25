@@ -17,6 +17,12 @@ type User struct {
 	CreatedAt  uint
 }
 
+type UsersRepository interface {
+	FindUserInChat(ctx context.Context, userId string, chatId string) *User
+	InsertNewUser(ctx context.Context, userId string, chatId string, username string) error
+	FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error)
+}
+
 type UserDAO struct {
 	Db *Database
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type RegCmd struct {
-	UserDAO db.UserDAO
+	UserDAO db.UsersRepository
 }
 
 func (RegCmd) Support(update tgbotapi.Update) bool {
