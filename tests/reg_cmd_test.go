@@ -3,6 +3,8 @@ package tests
 import (
 	"awesomeProject/cmd"
 	"awesomeProject/db"
+	"awesomeProject/translation"
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/golang/mock/gomock"
 	"testing"
@@ -70,7 +72,8 @@ func TestHandle_RegisterUser(t *testing.T) {
 		Return(nil)
 
 	regCmd := cmd.RegCmd{
-		UserDAO: userDaoMock,
+		UserDAO:     userDaoMock,
+		Translation: translation.NewTranslationWithDefault(),
 	}
 
 	update := tgbotapi.Update{
@@ -84,7 +87,7 @@ func TestHandle_RegisterUser(t *testing.T) {
 
 	tMock.EXPECT().SendMessage(gomock.Eq(update), "🤡 Привет, devanboo. Теперь ты участвуешь в игре!")
 
-	regCmd.Handle(tMock, update)
+	regCmd.Handle(context.TODO(), tMock, update)
 }
 
 func TestHandle_UserAlreadyExists(t *testing.T) {
@@ -101,7 +104,7 @@ func TestHandle_UserAlreadyExists(t *testing.T) {
 			TelegramId: "10",
 		})
 
-	regCmd := cmd.RegCmd{UserDAO: userDaoMock}
+	regCmd := cmd.RegCmd{UserDAO: userDaoMock, Translation: translation.NewTranslationWithDefault()}
 
 	update := tgbotapi.Update{
 		Message: &tgbotapi.Message{
@@ -114,5 +117,5 @@ func TestHandle_UserAlreadyExists(t *testing.T) {
 
 	tMock.EXPECT().SendMessage(gomock.Eq(update), "🗿🗿🗿 Ты уже зарегистрирован в игре")
 
-	regCmd.Handle(tMock, update)
+	regCmd.Handle(context.TODO(), tMock, update)
 }

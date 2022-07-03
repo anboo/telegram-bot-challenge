@@ -53,7 +53,7 @@ func (c RegCmd) Handle(ctx context.Context, api client.TelegramClient, update tg
 	}
 
 	msg := c.Translation.Trans(
-		"RU",
+		translation.RU,
 		translation.YouRegistered,
 		&map[string]string{"username": update.Message.From.String()},
 	)

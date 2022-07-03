@@ -2,6 +2,8 @@ package tests
 
 import (
 	"awesomeProject/cmd"
+	"awesomeProject/translation"
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/golang/mock/gomock"
 	"testing"
@@ -48,7 +50,7 @@ func Test_StartCmd_Support(t *testing.T) {
 func Test_StartCmd_StartMessage(t *testing.T) {
 	tMock := NewMockTelegramClient(gomock.NewController(t))
 
-	startCmd := cmd.StartCmd{}
+	startCmd := cmd.StartCmd{Translation: translation.NewTranslationWithDefault()}
 
 	update := tgbotapi.Update{
 		Message: &tgbotapi.Message{
@@ -63,5 +65,5 @@ func Test_StartCmd_StartMessage(t *testing.T) {
 		gomock.Eq("Привет! Для регистрации в игре вызови /reg в групповом чате. Для старта челленджа дня вызови /challenge"),
 	)
 
-	startCmd.Handle(tMock, update)
+	startCmd.Handle(context.TODO(), tMock, update)
 }

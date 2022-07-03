@@ -1,8 +1,8 @@
 package translation
 
 const (
-	RU = "ru"
-	EN = "en"
+	RU = "RU"
+	EN = "EN"
 
 	HelloStartMessage           = "hello_start_message"
 	ChallengeMessage            = "challenge_message"
