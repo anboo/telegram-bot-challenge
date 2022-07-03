@@ -24,12 +24,12 @@ var handlers []cmd.Cmd
 func main() {
 	db := db2.CreateDatabase(os.Getenv("POSTGRESQL_DSN"))
 
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+
 	driver, err := postgres.WithInstance(db.Conn(ctx), &postgres.Config{})
 	if err != nil {
 		panic(err.Error())
 	}
-
-	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 
 	path, _ := os.Getwd()
 	m, err := migrate.NewWithDatabaseInstance("file:///"+path+"/migrations", "postgresql", driver)

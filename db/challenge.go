@@ -12,7 +12,7 @@ type ChallengeDAO struct {
 }
 
 func (u ChallengeDAO) FindChallengeToday(ctx context.Context, userId string, chatId string) *User {
-	row := u.Db.GetDatabase().QueryRowContext(
+	row := u.Db.Conn(ctx).QueryRowContext(
 		ctx,
 		"SELECT id, telegram_id, chat_id, created_at FROM challenge_result WHERE chat_id = $1 AND telegram_id = $2 LIMIT 1",
 		chatId,

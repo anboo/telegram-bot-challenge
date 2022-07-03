@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"log"
 	"sync"
-	"time"
 )
 
 type Database struct {
@@ -19,10 +18,6 @@ func CreateDatabase(dsn string) *Database {
 }
 
 func (d *Database) Conn(ctx context.Context) *sql.DB {
-	d.db.SetMaxOpenConns(1)
-	d.db.SetMaxIdleConns(1)
-	d.db.SetConnMaxIdleTime(30 * time.Minute)
-
 	if d.db == nil {
 		d.connect()
 	} else {

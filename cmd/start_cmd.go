@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"awesomeProject/client"
+	"awesomeProject/translation"
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
