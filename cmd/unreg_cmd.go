@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -13,7 +14,7 @@ func (UnRegCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "unreg"
 }
 
-func (UnRegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (UnRegCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	txt := fmt.Sprintf("%s, больше ты не участвуешь в игре!", update.Message.From.String())
 	msg := tgbotapi.NewMessage(update.FromChat().ID, txt)
 	msg.ReplyToMessageID = update.Message.MessageID

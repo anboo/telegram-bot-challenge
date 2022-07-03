@@ -3,7 +3,6 @@ package cmd
 import (
 	"awesomeProject/db"
 	"context"
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strconv"
@@ -19,7 +18,7 @@ func (RegCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "reg"
 }
 
-func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (c RegCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	user := c.UserDAO.FindUserInChat(
 		context.TODO(),
 		strconv.Itoa(int(update.FromChat().ID)),
@@ -36,7 +35,7 @@ func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	}
 
 	err := c.UserDAO.InsertNewUser(
-		context.TODO(),
+		ctx,
 		strconv.Itoa(int(update.FromChat().ID)),
 		strconv.Itoa(int(update.Message.From.ID)),
 		update.Message.From.String(),
@@ -49,12 +48,5 @@ func (c RegCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
 			log.Println("error sending about database error message " + errSend.Error())
 		}
 		return
-	}
-
-	txt := fmt.Sprintf("🤡 Привет, %s. Теперь ты участвуешь в игре!", update.Message.From.String())
-	msg := tgbotapi.NewMessage(update.FromChat().ID, txt)
-
-	if _, err := api.Send(msg); err != nil {
-		panic(err)
 	}
 }

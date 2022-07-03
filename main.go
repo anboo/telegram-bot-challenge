@@ -3,6 +3,7 @@ package main
 import (
 	"awesomeProject/cmd"
 	db2 "awesomeProject/db"
+	"context"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/golang-migrate/migrate/v4"
@@ -17,7 +18,9 @@ var handlers []cmd.Cmd
 func main() {
 	db := db2.CreateDatabase(os.Getenv("POSTGRESQL_DSN"))
 
-	driver, err := postgres.WithInstance(db.GetDatabase(), &postgres.Config{})
+	ctx := context.Background()
+
+	driver, err := postgres.WithInstance(db.Conn(ctx), &postgres.Config{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -71,7 +74,7 @@ func main() {
 
 		for _, h := range handlers {
 			if h.Support(update) {
-				h.Handle(bot, update)
+				h.Handle(ctx, bot, update)
 				break
 			}
 		}

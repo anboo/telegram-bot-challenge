@@ -22,7 +22,7 @@ func (ChallengeCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "challenge"
 }
 
-func (c ChallengeCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (c ChallengeCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(
 		update.FromChat().ID,
 		"🤡🤡🤡 Итак, начинаем искать "+c.Name[1]+" дня в "+update.Message.Chat.Title,
@@ -34,7 +34,7 @@ func (c ChallengeCmd) Handle(api *tgbotapi.BotAPI, update tgbotapi.Update) {
 	}
 
 	usernames, err := c.UserDAO.FindUsernamesInChat(
-		context.TODO(),
+		ctx,
 		strconv.Itoa(int(update.FromChat().ID)),
 	)
 
