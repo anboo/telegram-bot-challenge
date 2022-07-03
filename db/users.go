@@ -17,12 +17,18 @@ type User struct {
 	CreatedAt  uint
 }
 
+type UsersRepository interface {
+	FindUserInChat(ctx context.Context, userId string, chatId string) *User
+	InsertNewUser(ctx context.Context, userId string, chatId string, username string) error
+	FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error)
+}
+
 type UserDAO struct {
 	Db *Database
 }
 
-func (u *UserDAO) FindUserInChat(ctx context.Context, userId string, chatId string) *User {
-	row := u.Db.Conn().QueryRowContext(
+func (u UserDAO) FindUserInChat(ctx context.Context, userId string, chatId string) *User {
+	row := u.Db.GetDatabase().QueryRowContext(
 		ctx,
 		"SELECT id, username, telegram_id, chat_id, created_at FROM users WHERE chat_id = $1 AND telegram_id = $2 LIMIT 1",
 		chatId,
@@ -47,8 +53,8 @@ func (u *UserDAO) FindUserInChat(ctx context.Context, userId string, chatId stri
 	return &user
 }
 
-func (u *UserDAO) InsertNewUser(ctx context.Context, userId string, chatId string, username string) error {
-	_, err := u.Db.Conn().ExecContext(
+func (u UserDAO) InsertNewUser(ctx context.Context, userId string, chatId string, username string) error {
+	_, err := u.Db.GetDatabase().ExecContext(
 		ctx,
 		"INSERT INTO users (id, username, telegram_id, chat_id, created_at) "+
 			"VALUES (uuid_generate_v4(), $1, $2, $3, $4) ON CONFLICT DO NOTHING",
@@ -65,8 +71,8 @@ func (u *UserDAO) InsertNewUser(ctx context.Context, userId string, chatId strin
 	return nil
 }
 
-func (u *UserDAO) FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error) {
-	rows, err := u.Db.Conn().QueryContext(ctx, "SELECT username FROM users WHERE chat_id = $1", chatId)
+func (u UserDAO) FindUsernamesInChat(ctx context.Context, chatId string) ([]string, error) {
+	rows, err := u.Db.GetDatabase().QueryContext(ctx, "SELECT username FROM users WHERE chat_id = $1", chatId)
 
 	if err != nil {
 		return nil, err

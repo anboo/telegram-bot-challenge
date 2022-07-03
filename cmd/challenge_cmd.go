@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"awesomeProject/client"
 	"awesomeProject/db"
 	"context"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 )
 
 type ChallengeCmd struct {
-	UserDAO db.UserDAO
+	UserDAO db.UsersRepository
 	Name    []string
 }
 
@@ -22,13 +23,13 @@ func (ChallengeCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "challenge"
 }
 
-func (c ChallengeCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (c ChallengeCmd) Handle(ctx context.Context, api client.TelegramClient, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(
 		update.FromChat().ID,
 		"🤡🤡🤡 Итак, начинаем искать "+c.Name[1]+" дня в "+update.Message.Chat.Title,
 	)
 
-	_, err := api.Send(msg)
+	_, err := api.GetAPI().Send(msg)
 	if err != nil {
 		log.Print("telegram error " + err.Error())
 	}
@@ -62,7 +63,7 @@ func (c ChallengeCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update t
 		}
 	}
 
-	_, err = api.Send(randMessage)
+	_, err = api.GetAPI().Send(randMessage)
 	if err != nil {
 		fmt.Println("cannot send challenge message " + err.Error())
 	}

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"awesomeProject/client"
 	"awesomeProject/db"
 	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -9,7 +10,7 @@ import (
 )
 
 type RegCmd struct {
-	UserDAO db.UserDAO
+	UserDAO db.UsersRepository
 }
 
 func (RegCmd) Support(update tgbotapi.Update) bool {
@@ -18,19 +19,15 @@ func (RegCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "reg"
 }
 
-func (c RegCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (c RegCmd) Handle(ctx context.Context, api client.TelegramClient, update tgbotapi.Update) {
 	user := c.UserDAO.FindUserInChat(
 		context.TODO(),
-		strconv.Itoa(int(update.FromChat().ID)),
 		strconv.Itoa(int(update.Message.From.ID)),
+		strconv.Itoa(int(update.FromChat().ID)),
 	)
 
 	if user != nil {
-		m := tgbotapi.NewMessage(update.FromChat().ID, "🗿🗿🗿 Ты уже зарегистрирован в игре")
-		_, err := api.Send(m)
-		if err != nil {
-			log.Println("error send message " + err.Error())
-		}
+		api.SendMessage(update, "🗿🗿🗿 Ты уже зарегистрирован в игре")
 		return
 	}
 
@@ -43,10 +40,12 @@ func (c RegCmd) Handle(ctx context.Context, api *tgbotapi.BotAPI, update tgbotap
 	if err != nil {
 		errMsg := tgbotapi.NewMessage(update.FromChat().ID, "Произошла техническая ошибка")
 		log.Println("error saving user to database " + err.Error())
-		_, errSend := api.Send(errMsg)
+		_, errSend := api.GetAPI().Send(errMsg)
 		if errSend != nil {
 			log.Println("error sending about database error message " + errSend.Error())
 		}
 		return
 	}
+
+	api.SendMessage(update, fmt.Sprintf("🤡 Привет, %s. Теперь ты участвуешь в игре!", update.Message.From.String()))
 }
