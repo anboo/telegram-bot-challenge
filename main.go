@@ -4,6 +4,7 @@ import (
 	"awesomeProject/client"
 	"awesomeProject/cmd"
 	db2 "awesomeProject/db"
+	"awesomeProject/translation"
 	"context"
 	"errors"
 	"fmt"
@@ -63,17 +64,25 @@ func main() {
 		fmt.Printf("Expected 2 words for plurization. Got value %v", names)
 	}
 
+	tm := translation.NewTranslationWithDefault()
+
 	handlers = append(
 		handlers,
 		cmd.RegCmd{
-			UserDAO: userDAO,
+			UserDAO:     userDAO,
+			Translation: tm,
 		},
 		cmd.ChallengeCmd{
-			UserDAO: userDAO,
-			Name:    []string{"клоун", "клоуна"},
+			UserDAO:     userDAO,
+			Translation: tm,
+			Name:        []string{"клоун", "клоуна"},
 		},
-		cmd.UnRegCmd{},
-		cmd.StartCmd{},
+		cmd.UnRegCmd{
+			Translation: tm,
+		},
+		cmd.StartCmd{
+			Translation: tm,
+		},
 	)
 
 	go func() {

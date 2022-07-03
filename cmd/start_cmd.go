@@ -8,7 +8,7 @@ import (
 )
 
 type StartCmd struct {
-	translation *translation.Translation
+	Translation *translation.Translation
 }
 
 func (s StartCmd) Support(update tgbotapi.Update) bool {
@@ -18,6 +18,6 @@ func (s StartCmd) Support(update tgbotapi.Update) bool {
 func (s StartCmd) Handle(ctx context.Context, bot client.TelegramClient, update tgbotapi.Update) {
 	bot.ReplyMessage(
 		update,
-		"Привет! Для регистрации в игре вызови /reg в групповом чате. Для старта челленджа дня вызови /challenge",
+		s.Translation.Trans(translation.RU, translation.HelloStartMessage, nil),
 	)
 }

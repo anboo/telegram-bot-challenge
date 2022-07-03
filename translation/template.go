@@ -4,14 +4,15 @@ import "strings"
 
 var templates = map[string]map[string]string{
 	RU: {
-		helloStartMessage:           "Привет! Для регистрации в игре вызови /reg в групповом чате. Для старта челленджа дня вызови /challenge",
-		challengeMessage:            "🤡🤡🤡 Итак, начинаем искать %name% дня в %chatName%",
-		errorMessage:                "🤡🤡🤡 %name% дня - разработчик бота, потому что произошла ошибка, попробуйте снова чуть позже...",
-		maxPlayersMessage:           "🤡 Для выбора %name% дня нужно чтобы было не меньше 2 игроков",
-		resultMessage:               "Поздравляю!!! 🤡🤡🤡 Ты %name% дня, @%username%",
-		youAlreadyRegisteredMessage: "🗿🗿🗿 Ты уже зарегистрирован в игре",
-		internalError:               "Произошла техническая ошибка",
-		youExited:                   "%username%, больше ты не участвуешь в игре!",
+		HelloStartMessage:           "Привет! Для регистрации в игре вызови /reg в групповом чате. Для старта челленджа дня вызови /challenge",
+		ChallengeMessage:            "🤡🤡🤡 Итак, начинаем искать %name% дня в %chatName%",
+		ErrorMessage:                "🤡🤡🤡 %name% дня - разработчик бота, потому что произошла ошибка, попробуйте снова чуть позже...",
+		MaxPlayersMessage:           "🤡 Для выбора %name% дня нужно чтобы было не меньше 2 игроков",
+		ResultMessage:               "Поздравляю!!! 🤡🤡🤡 Ты %name% дня, @%username%",
+		YouAlreadyRegisteredMessage: "🗿🗿🗿 Ты уже зарегистрирован в игре",
+		InternalError:               "Произошла техническая ошибка",
+		YouExited:                   "%username%, больше ты не участвуешь в игре!",
+		YouRegistered:               "🤡 Привет, %username%. Теперь ты участвуешь в игре!",
 	},
 }
 
@@ -28,7 +29,7 @@ func NewTranslation(templates map[string]map[string]string) *Translation {
 	return &Translation{templates: templates}
 }
 
-func (t *Translation) Trans(locale string, code string, args map[string]string) string {
+func (t *Translation) Trans(locale string, code string, args *map[string]string) string {
 	v, ok := t.templates[locale]
 
 	if !ok && t.defaultLocale != "" && t.defaultLocale != locale {
@@ -40,8 +41,10 @@ func (t *Translation) Trans(locale string, code string, args map[string]string) 
 		return ""
 	}
 
-	for transKey, transVal := range args {
-		val = strings.Replace(val, "%"+transKey+"%", transVal, 1)
+	if args != nil {
+		for transKey, transVal := range *args {
+			val = strings.Replace(val, "%"+transKey+"%", transVal, 1)
+		}
 	}
 
 	return val

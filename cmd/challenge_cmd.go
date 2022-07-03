@@ -3,6 +3,7 @@ package cmd
 import (
 	"awesomeProject/client"
 	"awesomeProject/db"
+	"awesomeProject/translation"
 	"context"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -13,8 +14,9 @@ import (
 )
 
 type ChallengeCmd struct {
-	UserDAO db.UsersRepository
-	Name    []string
+	UserDAO     db.UsersRepository
+	Translation *translation.Translation
+	Name        []string
 }
 
 func (ChallengeCmd) Support(update tgbotapi.Update) bool {
@@ -24,9 +26,17 @@ func (ChallengeCmd) Support(update tgbotapi.Update) bool {
 }
 
 func (c ChallengeCmd) Handle(ctx context.Context, api client.TelegramClient, update tgbotapi.Update) {
+	c.Translation.Trans(translation.RU, translation.ChallengeMessage, &map[string]string{
+		"name":     c.Name[1],
+		"chatName": update.Message.Chat.Title,
+	})
+
 	msg := tgbotapi.NewMessage(
 		update.FromChat().ID,
-		"🤡🤡🤡 Итак, начинаем искать "+c.Name[1]+" дня в "+update.Message.Chat.Title,
+		c.Translation.Trans(translation.RU, translation.ChallengeMessage, &map[string]string{
+			"name":     c.Name[1],
+			"chatName": update.Message.Chat.Title,
+		}),
 	)
 
 	_, err := api.GetAPI().Send(msg)
@@ -45,20 +55,27 @@ func (c ChallengeCmd) Handle(ctx context.Context, api client.TelegramClient, upd
 
 		randMessage = tgbotapi.NewMessage(
 			update.FromChat().ID,
-			"🤡🤡🤡 "+c.Name[0]+" дня - разработчик бота, потому что произошла ошибка, попробуйте снова чуть позже...",
+			c.Translation.Trans(translation.RU, translation.ErrorMessage, &map[string]string{
+				"name": c.Name[1],
+			}),
 		)
 	} else {
 		if len(usernames) < 2 {
 			randMessage = tgbotapi.NewMessage(
 				update.FromChat().ID,
-				"🤡 Для выбора "+c.Name[1]+" дня нужно чтобы было не меньше 2 игроков",
+				c.Translation.Trans(translation.RU, translation.MaxPlayersMessage, &map[string]string{
+					"name": c.Name[1],
+				}),
 			)
 		} else {
 			rand.Seed(time.Now().UnixNano())
 
 			randMessage = tgbotapi.NewMessage(
 				update.FromChat().ID,
-				"Поздравляю!!! 🤡🤡🤡 Ты "+c.Name[0]+" дня, @"+usernames[rand.Intn(len(usernames))],
+				c.Translation.Trans(translation.RU, translation.MaxPlayersMessage, &map[string]string{
+					"name":     c.Name[0],
+					"username": usernames[rand.Intn(len(usernames))],
+				}),
 			)
 		}
 	}

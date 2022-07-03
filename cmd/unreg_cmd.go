@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"context"
 	"awesomeProject/client"
-	"fmt"
+	"awesomeProject/translation"
+	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type UnRegCmd struct{}
+type UnRegCmd struct {
+	Translation *translation.Translation
+}
 
 func (UnRegCmd) Support(update tgbotapi.Update) bool {
 	return update.Message != nil &&
@@ -15,8 +17,10 @@ func (UnRegCmd) Support(update tgbotapi.Update) bool {
 		update.Message.Command() == "unreg"
 }
 
-func (UnRegCmd) Handle(ctx context.Context, api client.TelegramClient, update tgbotapi.Update) {
-	txt := fmt.Sprintf("%s, больше ты не участвуешь в игре!", update.Message.From.String())
+func (c UnRegCmd) Handle(ctx context.Context, api client.TelegramClient, update tgbotapi.Update) {
+	txt := c.Translation.Trans(translation.RU, translation.YouExited, &map[string]string{
+		"username": update.Message.From.String(),
+	})
 
 	msg := tgbotapi.NewMessage(update.FromChat().ID, txt)
 	msg.ReplyToMessageID = update.Message.MessageID
